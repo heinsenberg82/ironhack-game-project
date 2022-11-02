@@ -2,14 +2,15 @@
 
 export default class Background {
     constructor() {
-        this.x = 0;        
-        this.y = 0;
+        state.BACKGROUND.X = 0;
+        state.BACKGROUND.Y = 0;
         this.spriteWidth = 314;
         this.spriteHeight = 100;
-        this.width = this.spriteWidth * 6;
-        this.heigth = this.spriteHeight * 6;
+        state.BACKGROUND.WIDTH = this.spriteWidth * 6;
+        state.BACKGROUND.HEIGHT = this.spriteHeight * 6;
+        state.BACKGROUND.VISIBLE_WIDTH = state.BACKGROUND.WIDTH * 0.3
         this.layers = [];
-        this.speed = 1;
+        this.speed = 0.5;
         
         this.layer1 = new Image();
         this.layer1.src = "/images/background/1-Background.png";
@@ -37,7 +38,7 @@ export default class Background {
 
         this.layer7 = new Image();
         this.layer7.src = "/images/background/7-tileset.png";
-        this.layer7.speed = this.speed * 1;
+        this.layer7.speed = this.speed;
         
         this.layers.push(this.layer1, this.layer2, this.layer3, this.layer4, this.layer5, this.layer6, this.layer7);
     }
@@ -46,19 +47,22 @@ export default class Background {
     draw(ctx){
         this.layers.forEach(layer => {
             ctx.drawImage(layer, 0, 0, this.spriteWidth, this.spriteHeight,
-                this.x * layer.speed, this.y, this.width, this.heigth);
+                state.BACKGROUND.X * layer.speed, state.BACKGROUND.Y, state.BACKGROUND.WIDTH, state.BACKGROUND.HEIGHT);
         });
     }
     
-    moveLeft(){
-        if (this.x <= 0){
-            this.x++;
+    configMove(){
+        
+        if (state.PLAYER.MOVING && state.PLAYER.X < 200 && !state.PLAYER.FACING_RIGHT){
+            if (state.BACKGROUND.X <= 0){
+                state.BACKGROUND.X+=2;
+            }
         }
-    }
-    
-    moveRight(){
-        if (Math.abs(this.x) < this.width * 0.3){
-            this.x-=2;
+        
+        if (state.PLAYER.MOVING && state.PLAYER.X > 450 && state.PLAYER.FACING_RIGHT){
+            if (Math.abs(state.BACKGROUND.X) < state.BACKGROUND.WIDTH * 0.3){
+                state.BACKGROUND.X-=2;
+            }
         }
     }
 }

@@ -3,7 +3,8 @@ import InputHandler from "./InputHandler.js";
 import Action from "./Action.js";
 
 export default class Player{
-    constructor() {
+    /** @param ctx { CanvasRenderingContext2D } */
+    constructor(ctx) {
         this.image = new Image();
         this.image.src = "/images/sprites/hero.png";
         
@@ -15,7 +16,7 @@ export default class Player{
         this.width = this.spriteWidth * this.sizeMultiplier;
         this.height = this.spriteHeight * this.sizeMultiplier;
         
-        this.x = 200;
+        state.PLAYER.X = 200;
         this.y = state.GROUND_Y;
         
         this.playerState = {
@@ -24,14 +25,21 @@ export default class Player{
                new Action("idle", 9, 10, 2),
                new Action("walk", 8, 3, 3),
                new Action("run", 8, 3, 4),
-               new Action("slash1", 7, 10, 8, "a"),
-               new Action("slash2", 5, 3, 9, "s"),
+               new Action("slash2", 5, 10, 9, true,"a"),
+               new Action("slash1", 7, 10, 8, true,"s"),
+               new Action("slam", 5, 15, 10, true,"d"),
+               new Action("spin", 6, 16, 11, true,"f"),
+               new Action("block", 6, 16, 12, true," "),
+               new Action("dash", 6, 10, 13, true,"z"),
+               new Action("hit", 2, 20, 26, true,"i"),
+               new Action("death", 6, 15, 27, true,"o", true),
            ],
+            /** @type { Action } */
+           activeAction: new Action("idle", 9, 10, 2),
            activeActionSpriteIndex: 0,
            frame: 0,
-           animating: false,
-           inputHandler: new InputHandler(),
-           facingRight: true
+           inputHandler: new InputHandler(ctx),
+           dead: false,
         }        
     }
     
@@ -39,80 +47,93 @@ export default class Player{
     draw(ctx){
         ctx.save();
         
-        let flip = !this.playerState.facingRight;
+        let flip = !state.PLAYER.FACING_RIGHT;
         if (flip){
             ctx.translate(this.spriteWidth, 0)
         }
         ctx.scale(flip ? -1 : 1, 1);
         const sx = this.playerState.frame * this.spriteWidth;
         
-        ctx.drawImage(this.image, sx, this.spriteHeight * (this.playerState.activeActionSpriteIndex - 1), 
-            this.spriteWidth, this.spriteHeight, (flip ? - this.x - 10 : this.x ), this.y, this.width, this.height);
+        ctx.drawImage(this.image, sx, this.spriteHeight * (this.playerState.activeAction.spriteIndex - 1), 
+            this.spriteWidth, this.spriteHeight, (flip ? - state.PLAYER.X- 10 : state.PLAYER.X ), this.y, this.width, this.height);
         
         ctx.restore();
     }
     
     update(){
         const pressedKey = this.playerState.inputHandler?.keys[this.playerState.inputHandler.keys.length - 1]?.name;
-
-        if (pressedKey){
-            switch (pressedKey) {
-                case "ArrowRight":
-                    this.playerState.facingRight = true;
-                    this.walk("right");
-                    break;
-                case "ArrowLeft":
-                    this.playerState.facingRight = false;
-                    this.walk("left");
-                    break;
-                case "a":
-                    this.slash1();
-                    break;
-            }
-        } else{
-            this.idle();
-        }
-    }
-
-    updatePlayerState(actionName, callback){
-        const action = this.playerState.actions.find(action => action.name === actionName);
-
-        if(action.spriteIndex !== this.playerState.activeActionSpriteIndex){
-            this.playerState = {
-                ...this.playerState,
-                activeActionSpriteIndex: action.spriteIndex,
-                frame: 0,
-            }
-        }
-
-        if (state.GAME_FRAME % action.speedModifier === 0){
-            if (this.playerState.frame > action.frameCount - 2){
-                this.playerState.frame = 0
-            } else {
-                this.playerState.frame++;
-            }
-
-            callback?.();
-        }
         
-        return action;
-    }
-    
-    idle(){
-        this.updatePlayerState("idle");
-    }
-    
-    walk(direction){
-        this.updatePlayerState("walk", () => {
-            direction === "right"
-                ? this.x += 2
-                : this.x -= 2 ;
-        });
-    }
-    
-    slash1(){
-        this.playerState.animating = true;
-        const action = this.updatePlayerState("slash1");
-        this.playerState.animating = !action.endAnimation(this);
+        if (!this.playerState.dead){
+            if (pressedKey){
+                switch (pressedKey) {
+                    case "ArrowRight":
+                        state.PLAYER.MOVING = true;
+                        state.PLAYER.FACING_RIGHT = true;
+                        
+                        Action.updatePlayerState("walk", this, () => {
+                            if (state.PLAYER.X < state.BACKGROUND.VISIBLE_WIDTH){
+                                state.PLAYER.X += 2;
+                            }
+                        });
+                        
+                        break;
+                    case "ArrowLeft":
+                        state.PLAYER.MOVING = true;
+                        state.PLAYER.FACING_RIGHT = false;
+                        
+                        Action.updatePlayerState("walk", this, () => {
+                            if (state.PLAYER.X > state.BACKGROUND.X){
+                                state.PLAYER.X -= 2;
+                            }
+                        });
+                        
+                        break;
+                    case "s":
+                        Action.updatePlayerState("slash1", this);
+                        break;
+                    case "a":
+                        Action.updatePlayerState("slash2", this);
+                        break;
+                    case "d":
+                        Action.updatePlayerState("slam", this);
+                        break;
+                    case "f":
+                        Action.updatePlayerState("spin", this);
+                        break;
+                    case " ":
+                        Action.updatePlayerState("block", this);
+                        break;
+                    case "z":
+                        Action.updatePlayerState("dash", this);
+
+                        if (state.PLAYER.FACING_RIGHT && state.PLAYER.X < state.BACKGROUND.VISIBLE_WIDTH){
+                            state.PLAYER.X += 5;
+                        }
+
+                        if (!state.PLAYER.FACING_RIGHT && state.PLAYER.X > state.BACKGROUND.X){
+                            state.PLAYER.X -= 5;
+                        }
+                        
+                        
+                        break;
+                    case "i":
+                        Action.updatePlayerState("hit", this);
+                        break;
+
+                    case "o":
+                        Action.updatePlayerState("death", this);
+                        if (this.playerState.frame >= this.playerState.activeAction.frameCount - 1){
+                            this.playerState.dead = true;
+                        }
+                        break;
+                        
+                    default:
+                        state.PLAYER.MOVING = false;
+                }
+            } else {
+                state.PLAYER.MOVING = false;
+                Action.updatePlayerState("idle", this);
+            }
+        }
     }
 }

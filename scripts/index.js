@@ -9,7 +9,7 @@ window.addEventListener("load", ()=>{
     /** @type { CanvasRenderingContext2D } */
     const ctx = canvas.getContext("2d");
     const background = new Background();
-    const player = new Player();
+    const player = new Player(ctx);
 
     function startAnimating(fps) {
         fpsInterval = 1000 / fps;
@@ -21,7 +21,7 @@ window.addEventListener("load", ()=>{
     function animate(){
         requestAnimationFrame(animate);
 
-        now = Date.now();
+        now = window.performance.now();
         elapsed = now - then;
         
         if (elapsed > fpsInterval){
@@ -30,13 +30,15 @@ window.addEventListener("load", ()=>{
             background.draw(ctx);
             player.draw(ctx);
             player.update();
+            
+            background.configMove();
         }
     }
     
-    startAnimating(5);
+    startAnimating(25);
     
 });
 
 function clear(ctx){
-    ctx.clearRect(0, 0, state.CANVAS_WIDTH, state.CANVAS_HEIGHT);
+    ctx.clearRect(0, 0, state.CANVAS.WIDTH, state.CANVAS.HEIGHT);
 }
