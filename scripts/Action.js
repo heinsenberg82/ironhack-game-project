@@ -1,8 +1,6 @@
 ﻿import state from "./state.js";
 
 export default class Action{
-    static areKeysMarkedForDeletion = false;
-    
     constructor(name, frameCount, speedModifier, spriteIndex, blocking = false, key = "", indefinitely = false) {
         this.name = name;
         this.frameCount = frameCount;
@@ -15,64 +13,52 @@ export default class Action{
 
     /**
      * @param actionName { String }
-     * @param player { Player }
+     * @param player { Character }
      * @param callback { callback }
      */
     static updatePlayerState(actionName, player, callback){
         /** @type { Action } */
-        const action = player.playerState.actions.find(action => action.name === actionName);
+        const action = player.actions.find(action => action.name === actionName);
         
-        if(action.spriteIndex !== player.playerState.activeAction.spriteIndex){
-            player.playerState = {
-                ...player.playerState,
+        if(action.spriteIndex !== player.state.activeAction.spriteIndex){
+            player.state = {
+                ...player.state,
                 activeAction: action,
                 frame: 0,
             }
+
+            player.state.attackHitbox = null;
         }
 
         if (state.GAME_FRAME % action.speedModifier === 0){
             const lastSpriteFrame = action.frameCount - 1;
 
-            if (action.indefinitely && player.playerState.frame >= lastSpriteFrame){
-                player.playerState.frame = lastSpriteFrame;
-            } else if (player.playerState.frame >= lastSpriteFrame){
-                player.playerState.frame = 0;
+            if (action.indefinitely && player.state.frame >= lastSpriteFrame){
+                player.state.frame = lastSpriteFrame;
+            } else if (player.state.frame >= lastSpriteFrame){
+                player.state.frame = 0;
             } else {
-                player.playerState.frame++;
+                player.state.frame++;
             }
 
             callback?.();
         }
 
         if (action.blocking && !action.indefinitely){
-            this.#endAnimation(player);
+            this.#removeKeyFromInputHandler(player);
         }
 
         return action;
     }
 
     /**
-     * @param player { Player }
+     * @param player { Character }
      */
-    static #endAnimation(player) {
-        if (player.playerState.frame >= player.playerState.activeAction.frameCount - 1) {
-
-            this.removeMarkedForDeletion(player.playerState.inputHandler);
-            this.addKeysForDeletion(player.playerState.activeAction.key, player.playerState.inputHandler)
+    static #removeKeyFromInputHandler(player) {
+        if (player.state.inputHandler){
+            if (player.state.frame >= player.state.activeAction.frameCount - 1) {
+                player.state.inputHandler.removeKey(player.state.activeAction.key);
+            }   
         }
-    }
-    
-    static addKeysForDeletion(keyName, inputHandler){
-        inputHandler.markForDeletion(keyName);
-        
-        this.areKeysMarkedForDeletion = true;
-    }
-
-    static removeMarkedForDeletion(inputHandler){
-        if (this.areKeysMarkedForDeletion){
-            inputHandler.removeMarkedForDeletion();
-        }        
-        
-        this.areKeysMarkedForDeletion = false;
     }
 }

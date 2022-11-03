@@ -66,4 +66,8 @@ export default class InputHandler {
     markForDeletion(keyName){
         this.markedForDeletionKeyNames.push(keyName);
     }
+    
+    removeKey(keyName){
+        this.keys = this.keys.filter(key => key.name !== keyName);
+    }
 }

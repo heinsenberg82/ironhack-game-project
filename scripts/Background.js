@@ -1,7 +1,13 @@
 ﻿import state from "./state.js";
 
 export default class Background {
-    constructor() {
+    /**
+     * 
+     * @param enemies { Enemy[] }
+     */
+    constructor(enemies) {
+        this.enemies = enemies;
+        
         state.BACKGROUND.X = 0;
         state.BACKGROUND.Y = 0;
         this.spriteWidth = 314;
@@ -10,7 +16,7 @@ export default class Background {
         state.BACKGROUND.HEIGHT = this.spriteHeight * 6;
         state.BACKGROUND.VISIBLE_WIDTH = state.BACKGROUND.WIDTH * 0.3
         this.layers = [];
-        this.speed = 0.5;
+        this.speed = 1;
         
         this.layer1 = new Image();
         this.layer1.src = "/images/background/1-Background.png";
@@ -18,19 +24,19 @@ export default class Background {
 
         this.layer2 = new Image();
         this.layer2.src = "/images/background/2-super far.png";
-        this.layer2.speed = this.speed * 0.3;
+        this.layer2.speed = this.speed * 0.1;
 
         this.layer3 = new Image();
         this.layer3.src = "/images/background/3-far.png";
-        this.layer3.speed = this.speed * 0.5;
+        this.layer3.speed = this.speed * 0.2;
 
         this.layer4 = new Image();
         this.layer4.src = "/images/background/4-far light.png";
-        this.layer4.speed = this.speed * 0.7;
+        this.layer4.speed = this.speed * 0.4;
 
         this.layer5 = new Image();
         this.layer5.src = "/images/background/5-close.png";
-        this.layer5.speed = this.speed * 0.8;
+        this.layer5.speed = this.speed * 0.5;
 
         this.layer6 = new Image();
         this.layer6.src = "/images/background/6-close light.png";
@@ -52,16 +58,17 @@ export default class Background {
     }
     
     configMove(){
-        
         if (state.PLAYER.MOVING && state.PLAYER.X < 200 && !state.PLAYER.FACING_RIGHT){
             if (state.BACKGROUND.X <= 0){
                 state.BACKGROUND.X+=2;
+                this.enemies.forEach(enemy => enemy.x += 2)
             }
         }
-        
+
         if (state.PLAYER.MOVING && state.PLAYER.X > 450 && state.PLAYER.FACING_RIGHT){
             if (Math.abs(state.BACKGROUND.X) < state.BACKGROUND.WIDTH * 0.3){
                 state.BACKGROUND.X-=2;
+                this.enemies.forEach(enemy => enemy.x -= 2)
             }
         }
     }

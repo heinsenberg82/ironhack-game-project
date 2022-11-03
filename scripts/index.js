@@ -1,6 +1,7 @@
 ﻿import Background from "./Background.js"
 import state from "./state.js";
-import Player from "./Player.js";
+import Hero from "./Hero.js";
+import Enemy from "./Enemy.js";
 
 let fpsInterval, startTime, now, then, elapsed;
 
@@ -8,8 +9,11 @@ window.addEventListener("load", ()=>{
     const canvas = document.getElementById("main-canvas");
     /** @type { CanvasRenderingContext2D } */
     const ctx = canvas.getContext("2d");
-    const background = new Background();
-    const player = new Player(ctx);
+    const player = new Hero(ctx);
+    const enemy = new Enemy(ctx);
+    const enemies = [ enemy ];
+
+    const background = new Background(enemies);
 
     function startAnimating(fps) {
         fpsInterval = 1000 / fps;
@@ -28,8 +32,15 @@ window.addEventListener("load", ()=>{
             state.GAME_FRAME++;
             clear(ctx);
             background.draw(ctx);
+            
             player.draw(ctx);
-            player.update();
+            enemy.draw(ctx)
+            player.update(ctx);
+            enemy.update();
+            
+            if (player.state.hitbox.detectCollision(enemy.state.hitbox)){
+                console.log("collision detected")
+            }
             
             background.configMove();
         }
