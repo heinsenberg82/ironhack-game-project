@@ -9,13 +9,13 @@ export default class EndGameHandler {
         this.ctx = ctx;
     }
     
-    update(){
+    update(restartCallback){
         if (!state.ENEMIES.some(enemy => !enemy.state.dead)){
             this.#drawEndInstructions("YOU WON!");
-            this.#addPlayAgainEvent();
+            this.#addPlayAgainEvent(restartCallback);
         } else if(state.PLAYER.INSTANCE.state.dead){
             this.#drawEndInstructions("GAME OVER");
-            this.#addPlayAgainEvent();
+            this.#addPlayAgainEvent(restartCallback);
         }        
     }
     
@@ -33,10 +33,11 @@ export default class EndGameHandler {
             this.ctx.canvas.height / 2 + 40);
     }
     
-    #addPlayAgainEvent(){
+    #addPlayAgainEvent(restartCallback){
         window.addEventListener("keypress", e => {
             if (e.key === "Enter"){
-                window.location.reload();
+                restartCallback?.();
+                // window.location.reload();
             }
         });
 
