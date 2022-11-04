@@ -93,10 +93,12 @@ export default class Character {
         // ctx.restore();
         ////////////////////////////////////////// ///////////
 
-        if (state.PLAYER.INSTANCE.state.life > 0){
-            for (let i = 1; i <= state.PLAYER.INSTANCE.state.life; i++) {
+        if (state.PLAYER.INSTANCE.state.life >= 0){
+            for (let i = 0; i < state.PLAYER.INSTANCE.state.life; i++) {
+                const barNumber = i + 1;
+                
                 ctx.fillStyle = "#c62828";
-                ctx.fillRect(10 * i, 10, 100, 20);
+                ctx.fillRect(10 * barNumber, 10, 100, 20);
             }
         }
     }
