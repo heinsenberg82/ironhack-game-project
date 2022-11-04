@@ -12,10 +12,11 @@ body{
 canvas{
     border: 13px solid #37474f;
     border-radius: 7px;
+    max-width: 960px;
 }
 
 section {
-    background-image: url("/images/background/main-3.jpg");
+    background-image: url("../images/background/main-3.jpg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;

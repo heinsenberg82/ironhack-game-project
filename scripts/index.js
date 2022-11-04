@@ -91,7 +91,7 @@ function randomizeEnemy(intervalFunction, minDelay, maxDelay) {
 }
 
 function loadBackgroundMusic(){
-    const audio = new Audio("/sounds/background/1.mp3");
+    const audio = new Audio("./sounds/background/1.mp3");
     audio.loop = true;
     audio.load();
 }
