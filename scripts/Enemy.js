@@ -33,7 +33,7 @@ export default class Enemy extends Character{
             new Action("death", 11, 15, 2, false, "", true),
         ];
 
-        super(ctx, image, actions, dimensions, null, "vertical", 20);
+        super(ctx, image, actions, dimensions, null, "vertical", 50);
 
         this.state.facingRight = false;
 
@@ -44,7 +44,23 @@ export default class Enemy extends Character{
     
     hit(){
         this.state.attacking = false;
-        this.state.life--;
+        
+        switch (state.PLAYER.INSTANCE.state.activeAction.name) {
+            case "slam":
+                this.state.life-=3;
+                break;
+            case "slash1":
+                this.state.life-=2;
+                break;
+            default:
+                this.state.life--;
+        }
+        
+        if (state.PLAYER.INSTANCE.state.activeAction.name === "slam"){
+            this.state.life-=3;
+        } else {
+            this.state.life--;   
+        }
         
         if (this.state.life < 0){
             this.die();

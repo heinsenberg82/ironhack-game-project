@@ -236,7 +236,13 @@ export default class Hero extends Character{
     hit(){        
         this.state.lastStartedWalking = null;
         if (!this.state.blocking){
-            this.state.life--;
+            switch (state.ENEMIES[0].state.activeAction.name) {
+                case "special":
+                    this.state.life-= 3;
+                    break;
+                default:
+                    this.state.life--;
+            }
 
             if (this.state.life < 0){
                 this.die();

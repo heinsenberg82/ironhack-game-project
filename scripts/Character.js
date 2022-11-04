@@ -12,7 +12,7 @@ export default class Character {
      * @param life { Number }
      */
     constructor(ctx, image, actions, dimensions, 
-                inputHandler = null, spriteOrientation = "horizontal", life = 6) {
+                inputHandler = null, spriteOrientation = "horizontal", life = 10) {
         
         this.spriteOrientation = spriteOrientation;
         this.image = image;        
@@ -97,8 +97,8 @@ export default class Character {
             for (let i = 0; i < state.PLAYER.INSTANCE.state.life; i++) {
                 const barNumber = i + 1;
                 
-                ctx.fillStyle = "#c62828";
-                ctx.fillRect(10 * barNumber + 20, 15, 20, 20);
+                ctx.fillStyle = "#4caf50";
+                ctx.fillRect(10 * barNumber + 20, 15, 3, 20);
             }
         }
 
@@ -107,7 +107,7 @@ export default class Character {
                 const barNumber = i + 1;
 
                 ctx.fillStyle = "#c62828";
-                ctx.fillRect((ctx.canvas.width - 250) + 10 * barNumber, 15, 20, 20);
+                ctx.fillRect((ctx.canvas.width - 20) + 10 * -barNumber, 15, 3, 20);
             }
         }
     }

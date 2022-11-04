@@ -17,12 +17,6 @@ export default class InputHandler {
             { name: "f", persistent: true, interval: 300 },
             { name: " ", persistent: true, interval: 200 },
             { name: "z", persistent: true, interval: 200},
-            
-            
-            // TESTS //
-            // { name: "i", persistent: true },
-            // { name: "o", persistent: true },
-            // { name: "p", persistent: true },
         ];
         
         window.addEventListener("keydown", e => {
