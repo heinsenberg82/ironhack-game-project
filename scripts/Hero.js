@@ -8,19 +8,20 @@ export default class Hero extends Character{
     constructor(ctx) {
         const image = new Image();
         image.src = "/images/sprites/hero.png";
-        
+
         const dimensions = {
             x: 200,
             y: state.GROUND_Y,
-            hitbox: new HitBox(32, 20, 45, 50, 
-                () => - this.x - 23),
+            hitbox: new HitBox(200, state.GROUND_Y, 32, 20, 45, 50,
+                x => x + 5),
             spriteWidth: 90,
             spriteHeight: 37,
             sizeMultiplier: 2,
+            callbackFlipCalcX: (x) => - x - 20
         }
         
         const actions = [
-            new Action("staticIdle", 1, 3, 1),
+            // new Action("staticIdle", 1, 3, 1),
             new Action("idle", 9, 10, 2),
             new Action("walk", 8, 3, 3),
             new Action("run", 8, 3, 4),
@@ -31,8 +32,8 @@ export default class Hero extends Character{
             new Action("spin", 6, 16, 11, true,"f"),
             new Action("block", 6, 16, 12, true," "),
             new Action("dash", 6, 10, 13, true,"z"),
-            new Action("hit", 2, 20, 26, true,"i"),
-            new Action("death", 6, 15, 27, true,"o", true),
+            new Action("hit", 3, 5, 26, true,"i", false, 50),
+            new Action("death", 6, 12, 27, true,null, true),
         ];
         
         const inputHandler = new InputHandler(ctx);
@@ -40,7 +41,6 @@ export default class Hero extends Character{
         super(ctx, image, actions, dimensions, inputHandler);
         
         this.state.facingRight = true;
-        this.state.lastStartednWalking = 0;
         this.sprintInterval = 80;
         this.runInterval = 180;
     }
@@ -48,143 +48,176 @@ export default class Hero extends Character{
     update(ctx) {
         super.update();
         
-        const pressedKey = this.state.inputHandler?.keys[this.state.inputHandler.keys.length - 1]?.name;
+        if (this.state.activeAction.durationInFrames || this.state.activeAction.indefinitely){
+            Action.updatePlayerState(this.state.activeAction.name, this);
+        } else{
+            const pressedKey = this.state.inputHandler?.keys[this.state.inputHandler.keys.length - 1]?.name;
 
-        if (!this.state.dead){
-            if (pressedKey){
-                const framesPassed = state.GAME_FRAME - this.state.lastStartednWalking;
-                
-                switch (pressedKey) {
-                    case "ArrowRight":
-                        this.state.moving = true;
-                        this.state.facingRight = true;
-                        this.state.lastStartednWalking ??= state.GAME_FRAME;
-                        
-                        if(framesPassed < this.sprintInterval){
-                            Action.updatePlayerState("walk", this, () => {
+            if (!this.state.dead){
+                if (pressedKey){
+                    const framesPassedStartedWalk = state.GAME_FRAME - this.state.lastStartedWalking;
 
-                                if (this.x < state.BACKGROUND.VISIBLE_WIDTH){
-                                    this.x += 2;
-                                    this.state.hitbox.x += 2;
-                                }
+                    switch (pressedKey) {
+                        case "ArrowRight":
+                            this.state.attacking = false;
+                            this.state.blocking = false;
+                            this.state.moving = true;
+                            this.state.facingRight = true;
+                            this.state.lastStartedWalking ??= state.GAME_FRAME;
+
+                            if(framesPassedStartedWalk < this.sprintInterval){
+                                Action.updatePlayerState("walk", this, () => {
+
+                                    if (this.x < state.BACKGROUND.VISIBLE_WIDTH){
+                                        this.x += 2;
+                                        this.state.hitbox.x += 2;
+                                    }
+                                });
+                            } else if (framesPassedStartedWalk < this.runInterval ) {
+                                Action.updatePlayerState("run", this, () => {
+                                    if (this.x < state.BACKGROUND.VISIBLE_WIDTH){
+                                        this.x += 3;
+                                        this.state.hitbox.x +=3;
+                                    }
+                                });
+                            } else {
+                                Action.updatePlayerState("runFast", this, () => {
+                                    if (this.x < state.BACKGROUND.VISIBLE_WIDTH){
+                                        this.x += 5;
+                                        this.state.hitbox.x +=5;
+                                    }
+                                });
+                            }
+
+                            break;
+                        case "ArrowLeft":
+                            this.state.attacking = false;
+                            this.state.blocking = false;
+                            this.state.moving = true;
+                            this.state.facingRight = false;
+                            this.state.lastStartedWalking ??= state.GAME_FRAME;
+
+                            if(framesPassedStartedWalk < this.sprintInterval){
+                                Action.updatePlayerState("walk", this, () => {
+                                    if (this.x > state.BACKGROUND.X){
+                                        this.x -= 2;
+                                        this.state.hitbox.x -=2;
+                                    }
+                                });
+                            } else if (framesPassedStartedWalk < this.runInterval ){
+                                Action.updatePlayerState("run", this, () => {
+                                    if (this.x > state.BACKGROUND.X){
+                                        this.x -= 3;
+                                        this.state.hitbox.x -=3;
+                                    }
+                                });
+                            } else {
+                                Action.updatePlayerState("runFast", this, () => {
+                                    if (this.x > state.BACKGROUND.X){
+                                        this.x -= 5;
+                                        this.state.hitbox.x -=5;
+                                    }
+                                });
+                            }
+
+                            break;
+                        case "s":
+                            this.state.lastStartedWalking = null;
+                            this.state.attacking = true;
+                            this.state.blocking = false;
+
+                            Action.updatePlayerState("slash1", this, () => {
+                                const { dx, dy, height } = this.state.hitbox;
+                                this.state.attackHitbox = new HitBox(this.x, this.y, dx, dy, 140, height,
+                                    x => x - 90, !this.state.facingRight);
+
+                                this.launchAttach(2);
                             });
-                        } else if (framesPassed < this.runInterval ) {
-                            Action.updatePlayerState("run", this, () => {
-                                if (this.x < state.BACKGROUND.VISIBLE_WIDTH){
-                                    this.x += 3;
-                                    this.state.hitbox.x +=3;
-                                }
+                            break;
+                        case "a":
+                            this.state.lastStartedWalking = null;
+                            this.state.attacking = true;
+                            this.state.blocking = false;
+
+                            Action.updatePlayerState("slash2", this, () => {
+                                const { dx, dy, height } = this.state.hitbox;
+                                this.state.attackHitbox = new HitBox(this.x, this.y, dx, dy, 150, height,
+                                    x => x - 100, !this.state.facingRight);
+
+                                this.launchAttach(2);
                             });
-                        } else {
-                            Action.updatePlayerState("runFast", this, () => {
-                                if (this.x < state.BACKGROUND.VISIBLE_WIDTH){
-                                    this.x += 4;
-                                    this.state.hitbox.x +=4;
-                                }
+                            break;
+                        case "d":
+                            this.state.lastStartedWalking = null;
+                            this.state.attacking = true;
+                            this.state.blocking = false;
+
+                            Action.updatePlayerState("slam", this, () => {
+                                const { dx, dy } = this.state.hitbox;
+                                this.state.attackHitbox = new HitBox(this.x, this.y, dx, dy - 20, 150, 70,
+                                    x => x - 110, !this.state.facingRight);
+
+                                this.launchAttach(2);
                             });
-                        }
+                            break;
+                        case "f":
+                            this.state.lastStartedWalking = null;
+                            this.state.attacking = true;
+                            this.state.blocking = false;
 
-                        break;
-                    case "ArrowLeft":
-                        this.state.moving = true;
-                        this.state.facingRight = false;
-                        this.state.lastStartednWalking ??= state.GAME_FRAME;
-                        
-                        if(framesPassed < this.sprintInterval){
-                            Action.updatePlayerState("walk", this, () => {
-                                if (this.x > state.BACKGROUND.X){
-                                    this.x -= 2;
-                                    this.state.hitbox.x -=2;
-                                }
+                            Action.updatePlayerState("spin", this, () => {
+                                const { dx, dy, height } = this.state.hitbox;
+                                this.state.attackHitbox = new HitBox(this.x, this.y, dx - 40, dy, 180, height,
+                                    x => x - 60, !this.state.facingRight);
+
+                                this.launchAttach(1);
                             });
-                        } else if (framesPassed < this.runInterval ){
-                            Action.updatePlayerState("run", this, () => {
-                                if (this.x > state.BACKGROUND.X){
-                                    this.x -= 3;
-                                    this.state.hitbox.x -=3;
-                                }
-                            });
-                        } else {
-                            Action.updatePlayerState("runFast", this, () => {
-                                if (this.x > state.BACKGROUND.X){
-                                    this.x -= 4;
-                                    this.state.hitbox.x -=4;
-                                }
-                            });
-                        }
+                            break;
+                        case " ":
+                            this.state.lastStartedWalking = null;
+                            this.state.attacking = false;
+                            this.state.blocking = true;
 
-                        break;
-                    case "s":
-                        this.state.lastStartednWalking = null;
-                        
-                        Action.updatePlayerState("slash1", this);
-                        break;
-                    case "a":
-                        this.state.lastStartednWalking = null;
-                        
-                        Action.updatePlayerState("slash2", this);
-                        
-                        this.state.attackHitbox = { ...this.state.hitbox }
-                        if (this.state.facingRight) {
-                            this.state.attackHitbox.x += this.state.frame ^ 5 * 20
-                        } else {
-                            this.state.attackHitbox.x -= this.state.frame ^ 5 * 22
-                        }
-                        break;
-                    case "d":
-                        this.state.lastStartednWalking = null;
-                        
-                        Action.updatePlayerState("slam", this);
-                        break;
-                    case "f":
-                        this.state.lastStartednWalking = null;
-                        
-                        Action.updatePlayerState("spin", this);
-                        break;
-                    case " ":
-                        this.state.lastStartednWalking = null;
-                        
-                        Action.updatePlayerState("block", this);
-                        break;
-                    case "z":
-                        this.state.lastStartednWalking = null;
-                        
-                        Action.updatePlayerState("dash", this);
+                            Action.updatePlayerState("block", this);
+                            break;
+                        case "z":
+                            this.state.attacking = false;
+                            this.state.blocking = false;
+                            this.state.lastStartedWalking = null;
 
-                        if (this.state.facingRight && this.x < state.BACKGROUND.VISIBLE_WIDTH){
-                            this.x += 5;
-                            this.state.hitbox.x += 5;
-                        }
+                            Action.updatePlayerState("dash", this);
 
-                        if (!this.state.facingRight && this.x > state.BACKGROUND.X){
-                            this.x -= 5;
-                            this.state.hitbox.x -= 5;
-                        }
+                            if (this.state.facingRight && this.x < state.BACKGROUND.VISIBLE_WIDTH){
+                                this.x += 5;
+                                this.state.hitbox.x += 5;
+                            }
 
+                            if (!this.state.facingRight && this.x > state.BACKGROUND.X){
+                                this.x -= 5;
+                                this.state.hitbox.x -= 5;
+                            }
 
-                        break;
-                    case "i":
-                        this.state.lastStartednWalking = null;
-                        
-                        Action.updatePlayerState("hit", this);
-                        break;
+                            break;
+                        case "i":
+                            this.state.attacking = false;
+                            this.state.blocking = false;
+                            this.state.lastStartedWalking = null;
 
-                    case "o":
-                        Action.updatePlayerState("death", this);
-                        if (this.state.frame >= this.state.activeAction.frameCount - 1){
-                            this.state.dead = true;
-                        }
-                        break;
+                            Action.updatePlayerState("hit", this);
+                            break;
 
-                    default:
-                        this.state.moving = false;
+                        case "p":
+                            this.state.inputHandler.removeKey("p")
+                            state.ENEMIES.forEach(enemy => enemy.special())
+                            break;
+
+                        default:
+                            this.state.moving = false;
+                    }
+                } else if(!this.state.activeAction.durationInFrames) {
+                    this.idle();
                 }
-            } else {
-                this.state.moving = false;
-                this.state.lastStartednWalking = null;
-                
-                Action.updatePlayerState("idle", this);
-            }
+            }   
         }
         
         if (this.x < 0){
@@ -194,5 +227,37 @@ export default class Hero extends Character{
         state.PLAYER.X = this.x;
         state.PLAYER.FACING_RIGHT = this.state.facingRight;
         state.PLAYER.MOVING = this.state.moving;
+    }
+
+    hit(){        
+        this.state.lastStartedWalking = null;
+        if (!this.state.blocking){
+            this.state.life--;
+
+            if (this.state.life < 0){
+                this.die();
+            } else {
+                Action.updatePlayerState("hit", this);
+            }   
+        } else {
+            console.log("blocked")
+        }
+    }
+    
+    die(){
+        Action.updatePlayerState("death", this);
+        this.state.dead = true;
+    }
+    
+    launchAttach(attackFrame){
+        if (this.state.frame === attackFrame){
+            state.ENEMIES.forEach(enemy => {
+                if (!enemy.state.attacking){
+                    if(HitBox.detectCollision(this.state.attackHitbox, enemy.state.hitbox)){
+                        enemy.hit();
+                    }   
+                }
+            });
+        }
     }
 }

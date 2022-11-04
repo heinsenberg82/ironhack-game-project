@@ -1,4 +1,5 @@
 ﻿import Action from "./Action.js";
+import HitBox from "./HitBox.js";
 
 export default class Character {
     /** @param ctx { CanvasRenderingContext2D }
@@ -7,16 +8,19 @@ export default class Character {
      * @param dimensions { { spriteWidth: Number, hitbox: HitBox, spriteHeight: Number, sizeMultiplier: Number }}
      * @param inputHandler { InputHandler }
      * @param spriteOrientation { "horizontal" | "vertical" }
+     * @param life { Number }
      */
-    constructor(ctx, image, actions, dimensions, inputHandler = null, spriteOrientation = "horizontal") {
+    constructor(ctx, image, actions, dimensions, 
+                inputHandler = null, spriteOrientation = "horizontal", life = 2) {
         
         this.spriteOrientation = spriteOrientation;
         this.image = image;        
-        const { x, y, hitbox, spriteWidth, spriteHeight, sizeMultiplier } = dimensions;
+        const { x, y, hitbox, spriteWidth, spriteHeight, sizeMultiplier, callbackFlipCalcX } = dimensions;
         
         this.spriteWidth = spriteWidth;
         this.spriteHeight = spriteHeight;
         this.sizeMultiplier = sizeMultiplier;
+        this.callbackFlipCalcX = callbackFlipCalcX;
         
         this.width = this.spriteWidth * this.sizeMultiplier;
         this.height = this.spriteHeight * this.sizeMultiplier;
@@ -28,15 +32,25 @@ export default class Character {
         
         this.state = {
             /** @type { Action } */
-           activeAction: new Action("idle", 9, 10, 2),
+           activeAction: new Action(actions[0], actions[0].frameCount, 
+                actions[0].speedModifier, actions[0].spriteIndex), 
+           lastActionCalledAt: null,
            activeActionSpriteIndex: 0,
            frame: 0,
            inputHandler: inputHandler,
-           facingRight: null,
-           moving: false,
+           facingRight: true,
+           moving: false, 
+           attacking: false,
+           blocking: false,
+           lastStartedWalking: 0,
            dead: false,
-           hitbox: hitbox.init(this.x, this.y),
+            /** @type { HitBox } */
+           hitbox: hitbox,
+            /** @type { HitBox } */
            attackHitbox: null,
+           /** @type { HitBox } */
+           backupHitbox: hitbox,
+           life: life,
         }        
     }
     
@@ -60,37 +74,40 @@ export default class Character {
             sy = this.state.frame * this.spriteHeight;
         }
         
-        const dx = flip ? - this.x - 10 : this.x;
+        const dx = flip ? this.callbackFlipCalcX(this.x) : this.x;
         
         ctx.drawImage(this.image, sx, sy, this.spriteWidth, this.spriteHeight, dx, this.y, this.width, this.height); 
         ctx.restore();
         
         ///////// FOR TESTING PURPOSES !!!!! (visual hitboxes) ///////////////////////////
-        ctx.save();
-        ctx.strokeStyle = "red";
-        if (flip && !this.state.activeAction.blocking){
-            ctx.translate(this.state.hitbox.width, 0)
-            ctx.scale(-1, 1);
-        }
-
-        ctx.strokeRect((flip && !this.state.activeAction.blocking ? 
-            this.state.hitbox.callbackFlipCalcX?.()
-            : this.state.hitbox.x), 
-            this.state.hitbox.y, this.state.hitbox.width, this.state.hitbox.height);
-
-        if (this.state.attackHitbox){
-            ctx.strokeStyle = "cyan";
-            ctx.strokeRect((flip && !this.state.activeAction.blocking ?
-                    this.state.attackHitbox.callbackFlipCalcX?.()
-                    : this.state.attackHitbox.x),
-                this.state.attackHitbox.y, this.state.attackHitbox.width, this.state.attackHitbox.height);
-        }
-
-        ctx.restore();
+        // ctx.save();
+        // ctx.strokeStyle = "red";
+        // ctx.strokeRect(this.state.hitbox.x, this.state.hitbox.y, this.state.hitbox.width, this.state.hitbox.height);
+        //
+        // if (this.state.attackHitbox){
+        //     ctx.strokeStyle = "cyan";
+        //     ctx.strokeRect(this.state.attackHitbox.x, this.state.attackHitbox.y, this.state.attackHitbox.width, this.state.attackHitbox.height);   
+        // }
+        //
+        // ctx.restore();
         ////////////////////////////////////////// ///////////
     }
     
     update(){
-        this.state.hitbox = this.state.hitbox.init(this.x, this.y);
+        this.state.hitbox.update(this.x, this.y, !this.state.facingRight);
+        if (this.state.attackHitbox){
+            this.state.attackHitbox?.update(this.x, this.y, !this.state.facingRight);
+        }
+    }
+
+    idle(){
+        this.state.attacking = false;
+        this.state.blocking = false;
+        this.state.moving = false;
+        this.state.lastStartedWalking = null;
+        
+        this.state.hitbox = this.state.backupHitbox;
+
+        Action.updatePlayerState("idle", this);
     }
 }

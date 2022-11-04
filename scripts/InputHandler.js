@@ -20,14 +20,13 @@ export default class InputHandler {
             
             
             // TESTS //
-            { name: "i", persistent: true },
-            { name: "o", persistent: true },
-            { name: "p", persistent: true },
+            // { name: "i", persistent: true },
+            // { name: "o", persistent: true },
+            // { name: "p", persistent: true },
         ];
-        this.markedForDeletionKeyNames = [];
         
         window.addEventListener("keydown", e => {
-            const key = this.authorizedKeys.find(key => key.name === e.key);
+           const key = this.authorizedKeys.find(key => key.name === e.key);
             
             if (key && this.keys.indexOf(key) === -1){
                 
@@ -54,17 +53,6 @@ export default class InputHandler {
                 this.keys.splice(this.keys.indexOf(key), 1);
             }
         });
-    }
-
-    removeMarkedForDeletion(){{
-        this.keys = this.keys.filter(key => 
-            !this.markedForDeletionKeyNames.some(keyName => key.name === keyName));
-
-        this.markedForDeletionKeyNames = [];
-    }};
-    
-    markForDeletion(keyName){
-        this.markedForDeletionKeyNames.push(keyName);
     }
     
     removeKey(keyName){

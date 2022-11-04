@@ -1,13 +1,7 @@
 ﻿import state from "./state.js";
 
 export default class Background {
-    /**
-     * 
-     * @param enemies { Enemy[] }
-     */
-    constructor(enemies) {
-        this.enemies = enemies;
-        
+    constructor() {
         state.BACKGROUND.X = 0;
         state.BACKGROUND.Y = 0;
         this.spriteWidth = 314;
@@ -61,14 +55,14 @@ export default class Background {
         if (state.PLAYER.MOVING && state.PLAYER.X < 200 && !state.PLAYER.FACING_RIGHT){
             if (state.BACKGROUND.X <= 0){
                 state.BACKGROUND.X+=2;
-                this.enemies.forEach(enemy => enemy.x += 2)
+                state.ENEMIES.forEach(enemy => enemy.x += 2)
             }
         }
 
         if (state.PLAYER.MOVING && state.PLAYER.X > 450 && state.PLAYER.FACING_RIGHT){
             if (Math.abs(state.BACKGROUND.X) < state.BACKGROUND.WIDTH * 0.3){
                 state.BACKGROUND.X-=2;
-                this.enemies.forEach(enemy => enemy.x -= 2)
+                state.ENEMIES.forEach(enemy => enemy.x -= 2)
             }
         }
     }

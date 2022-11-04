@@ -2,15 +2,18 @@
     GAME_FRAME: 0,
     GROUND_Y: 385,
     CANVAS:{
-      WIDTH: 720,
+      WIDTH: 960,
       HEIGHT: 576,
     },
     PLAYER: {
+        INSTANCE: null,
         X: null,
         Y: null,
         FACING_RIGHT: true,
         MOVING: false
     },
+    ENEMIES: [],
+    ENEMY_LAST_ATTACK: "",
     BACKGROUND: {
         X: 0,
         Y: 0,
