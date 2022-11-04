@@ -5,9 +5,11 @@ import Enemy from "./Enemy.js";
 import EndGameHandler from "./EndGameHandler.js";
 
 let fpsInterval, startTime, now, then, elapsed;
+let backgroundAudioPlayed = false;
 
 window.addEventListener("load", ()=>{    
-    init()    
+    init()
+    loadBackgroundMusic();
 });
 
 function clearCanvas(ctx){
@@ -38,9 +40,16 @@ function randomizeEnemy(intervalFunction, minDelay, maxDelay) {
 }
 
 function loadBackgroundMusic(){
-    const audio = new Audio("/ironhack-game-project/images/background/1.mp3");
-    audio.loop = true;
-    audio.load();
+    window.addEventListener("keydown", () => {
+        const audio = new Audio("sounds/background/1.mp3");
+        audio.loop = true;
+        audio.volume = 0.3;
+        console.log(audio.paused)
+        if (!backgroundAudioPlayed){
+            backgroundAudioPlayed = true;
+            audio.play();   
+        }
+    })
 }
 
 function init(){
