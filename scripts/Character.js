@@ -98,7 +98,7 @@ export default class Character {
                 const barNumber = i + 1;
                 
                 ctx.fillStyle = "#c62828";
-                ctx.fillRect(10 * barNumber, 10, 100, 20);
+                ctx.fillRect(10 * barNumber, 10, 20, 20);
             }
         }
     }
