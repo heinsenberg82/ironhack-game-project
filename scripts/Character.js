@@ -101,6 +101,15 @@ export default class Character {
                 ctx.fillRect(10 * barNumber, 10, 20, 20);
             }
         }
+
+        if (state.ENEMIES[0]?.state.life >= 0){
+            for (let i = 0; i < state.ENEMIES[0]?.state.life; i++) {
+                const barNumber = i + 1;
+
+                ctx.fillStyle = "#c62828";
+                ctx.fillRect((ctx.canvas.width - 200) + 10 * barNumber, 10, 20, 20);
+            }
+        }
     }
     
     update(){
