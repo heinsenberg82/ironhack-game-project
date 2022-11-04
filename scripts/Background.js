@@ -13,7 +13,7 @@ export default class Background {
         this.speed = 1;
         
         this.layer1 = new Image();
-        this.layer1.src = "../images/background/1-Background.png";
+        this.layer1.src = "./images/background/1-Background.png";
         this.layer1.speed = this.speed;
 
         this.layer2 = new Image();

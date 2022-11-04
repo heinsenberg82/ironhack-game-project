@@ -36,8 +36,8 @@ export default class EndGameHandler {
     #addPlayAgainEvent(restartCallback){
         window.addEventListener("keypress", e => {
             if (e.key === "Enter"){
-                restartCallback?.();
-                // window.location.reload();
+                // restartCallback?.();
+                window.location.reload();
             }
         });
 
