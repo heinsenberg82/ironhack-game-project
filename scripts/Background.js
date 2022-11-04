@@ -13,31 +13,31 @@ export default class Background {
         this.speed = 1;
         
         this.layer1 = new Image();
-        this.layer1.src = "./images/background/1-Background.png";
+        this.layer1.src = "/ironhack-game-project/images/background/1-Background.png";
         this.layer1.speed = this.speed;
 
         this.layer2 = new Image();
-        this.layer2.src = "./images/background/2-super far.png";
+        this.layer2.src = "/ironhack-game-project/images/background/2-super far.png";
         this.layer2.speed = this.speed * 0.1;
 
         this.layer3 = new Image();
-        this.layer3.src = "./images/background/3-far.png";
+        this.layer3.src = "/ironhack-game-project/images/background/3-far.png";
         this.layer3.speed = this.speed * 0.2;
 
         this.layer4 = new Image();
-        this.layer4.src = "./images/background/4-far light.png";
+        this.layer4.src = "/ironhack-game-project/images/background/4-far light.png";
         this.layer4.speed = this.speed * 0.4;
 
         this.layer5 = new Image();
-        this.layer5.src = "./images/background/5-close.png";
+        this.layer5.src = "/ironhack-game-project/images/background/5-close.png";
         this.layer5.speed = this.speed * 0.5;
 
         this.layer6 = new Image();
-        this.layer6.src = "./images/background/6-close light.png";
+        this.layer6.src = "/ironhack-game-project/images/background/6-close light.png";
         this.layer6.speed = this.speed * 0.9;
 
         this.layer7 = new Image();
-        this.layer7.src = "./images/background/7-tileset.png";
+        this.layer7.src = "/ironhack-game-project/images/background/7-tileset.png";
         this.layer7.speed = this.speed;
         
         this.layers.push(this.layer1, this.layer2, this.layer3, this.layer4, this.layer5, this.layer6, this.layer7);

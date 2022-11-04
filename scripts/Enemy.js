@@ -6,7 +6,7 @@ import HitBox from "./HitBox.js";
 export default class Enemy extends Character{
     constructor(ctx) {
         const image = new Image();
-        image.src = "/images/sprites/enemies/guardian.png";
+        image.src = "/ironhack-game-project/images/sprites/enemies/guardian.png";
 
         const dimensions = {
             x: 400,
@@ -21,15 +21,15 @@ export default class Enemy extends Character{
 
         const actions = [
             new Action("walk", 8, 12, 9),
-            new Action("attack1", 12, 12, 0, false, "", false, null, { path: "./sounds/dark-guardian/light-attack.mp3", frame: 1 }),
-            new Action("attack2", 12, 12, 1, false, "", false, null, { path: "./sounds/dark-guardian/medium-attack.mp3", frame: 1 }),
+            new Action("attack1", 12, 12, 0, false, "", false, null, { path: "/ironhack-game-project/sounds/dark-guardian/light-attack.mp3", frame: 1 }),
+            new Action("attack2", 12, 12, 1, false, "", false, null, { path: "/ironhack-game-project/sounds/dark-guardian/medium-attack.mp3", frame: 1 }),
             new Action("back-from-special", 3, 16, 4),
-            new Action("special", 14, 16, 5, false, "", false, null, { path: "./sounds/dark-guardian/special.mp3", frame: 1 }),
+            new Action("special", 14, 16, 5, false, "", false, null, { path: "/ironhack-game-project/sounds/dark-guardian/special.mp3", frame: 1 }),
             new Action("hit", 2, 2, 3),
             new Action("death", 11, 15, 2, false, "", true),
         ];
 
-        super(ctx, image, actions, dimensions, null, "vertical");
+        super(ctx, image, actions, dimensions, null, "vertical", 15);
 
         this.state.facingRight = false;
 

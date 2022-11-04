@@ -1,5 +1,6 @@
 ﻿import Action from "./Action.js";
 import HitBox from "./HitBox.js";
+import state from "./state.js";
 
 export default class Character {
     /** @param ctx { CanvasRenderingContext2D }
@@ -11,7 +12,7 @@ export default class Character {
      * @param life { Number }
      */
     constructor(ctx, image, actions, dimensions, 
-                inputHandler = null, spriteOrientation = "horizontal", life = 2) {
+                inputHandler = null, spriteOrientation = "horizontal", life = 6) {
         
         this.spriteOrientation = spriteOrientation;
         this.image = image;        
@@ -91,6 +92,13 @@ export default class Character {
         //
         // ctx.restore();
         ////////////////////////////////////////// ///////////
+
+        if (state.PLAYER.INSTANCE.state.life > 0){
+            for (let i = 1; i <= state.PLAYER.INSTANCE.state.life; i++) {
+                ctx.fillStyle = "#c62828";
+                ctx.fillRect(10 * i, 10, 100, 20);
+            }
+        }
     }
     
     update(){
