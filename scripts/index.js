@@ -6,7 +6,7 @@ import EndGameHandler from "./EndGameHandler.js";
 
 let fpsInterval, startTime, now, then, elapsed;
 
-window.addEventListener("load", ()=>{
+window.addEventListener("load", ()=>{    
     const canvas = document.getElementById("main-canvas");
     /** @type { CanvasRenderingContext2D } */
     const ctx = canvas.getContext("2d");
@@ -88,4 +88,10 @@ function randomizeEnemy(intervalFunction, minDelay, maxDelay) {
             clearTimeout(timeout)
         },
     };
+}
+
+function loadBackgroundMusic(){
+    const audio = new Audio("/sounds/background/1.mp3");
+    audio.loop = true;
+    audio.load();
 }

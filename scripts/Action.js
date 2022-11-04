@@ -1,8 +1,8 @@
 ﻿import state from "./state.js";
 
 export default class Action{
-    constructor(name, frameCount, speedModifier, spriteIndex, blocking = false, key = "", 
-                indefinitely = false, durationInFrames = null) {
+    constructor(name, frameCount, speedModifier, spriteIndex, blocking = false, key = "",
+                indefinitely = false, durationInFrames = null, soundFileInfo = "") {
         this.name = name;
         this.frameCount = frameCount;
         this.speedModifier = speedModifier;
@@ -11,6 +11,11 @@ export default class Action{
         this.key = key;
         this.indefinitely = indefinitely;
         this.durationInFrames = durationInFrames;
+        this.soundFileInfo = soundFileInfo;
+        
+        if (soundFileInfo){
+            this.sound = new Audio(soundFileInfo.path);
+        }
     }
 
     /**
@@ -37,6 +42,10 @@ export default class Action{
         }
         
         if (state.GAME_FRAME % newAction.speedModifier === 0){
+            if (character.state.frame === character.state.activeAction.soundFileInfo.frame){
+                character.state.activeAction.sound?.play();
+            }
+            
             const lastSpriteFrame = newAction.frameCount - 1;
             
             if (character.state.frame >= lastSpriteFrame){
