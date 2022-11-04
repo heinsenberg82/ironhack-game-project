@@ -5,6 +5,10 @@ import InputHandler from "./InputHandler.js";
 import HitBox from "./HitBox.js";
 
 export default class Hero extends Character{
+    /**
+     * 
+     * @param ctx { CanvasRenderingContext2D }
+     */
     constructor(ctx) {
         const image = new Image();
         image.src = "/ironhack-game-project/images/sprites/hero.png";

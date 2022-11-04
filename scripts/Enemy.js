@@ -4,6 +4,10 @@ import state from "./state.js";
 import HitBox from "./HitBox.js";
 
 export default class Enemy extends Character{
+    /**
+     *
+     * @param ctx { CanvasRenderingContext2D }
+     */
     constructor(ctx) {
         const image = new Image();
         image.src = "/ironhack-game-project/images/sprites/enemies/guardian.png";
@@ -29,7 +33,7 @@ export default class Enemy extends Character{
             new Action("death", 11, 15, 2, false, "", true),
         ];
 
-        super(ctx, image, actions, dimensions, null, "vertical", 15);
+        super(ctx, image, actions, dimensions, null, "vertical", 20);
 
         this.state.facingRight = false;
 
