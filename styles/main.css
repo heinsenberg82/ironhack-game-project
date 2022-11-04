@@ -16,7 +16,7 @@ canvas{
 }
 
 section {
-    background-image: url("./ironhack-game-project/images/background/main-3.jpg");
+    background-image: url("/ironhack-game-project/images/background/main-3.jpg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
