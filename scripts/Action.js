@@ -28,7 +28,7 @@ export default class Action{
         const newAction = character.actions.find(action => action.name === actionName);
 
         if (character.state.activeAction.name !== newAction.name){
-            character.state.lastActionCalledAt = state.GAME_FRAME;
+            character.state.lastActionCalledAt = state.TIMESTAMP;
         }
 
         if(newAction.spriteIndex !== character.state.activeAction.spriteIndex){
@@ -41,7 +41,7 @@ export default class Action{
             character.state.attackHitbox = null;
         }
         
-        if (state.GAME_FRAME % newAction.speedModifier === 0){
+        if (Math.floor(state.TIMESTAMP) % newAction.speedModifier === 0){
             if (character.state.frame === character.state.activeAction.soundFileInfo.frame){
                 character.state.activeAction.sound?.play();
             }
@@ -52,7 +52,7 @@ export default class Action{
                 if (newAction.indefinitely){
                     character.state.frame = lastSpriteFrame
                 } else if (newAction.durationInFrames) {
-                    if (state.GAME_FRAME - character.state.lastActionCalledAt > newAction.durationInFrames) {
+                    if (state.TIMESTAMP - character.state.lastActionCalledAt > newAction.durationInFrames) {
                         character.idle();
                     } else {
                         character.state.frame = 0;

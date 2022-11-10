@@ -1,5 +1,5 @@
 ﻿const state = {
-    GAME_FRAME: 0,
+    TIMESTAMP: 0,
     GROUND_Y: 385,
     CANVAS:{
       WIDTH: 960,

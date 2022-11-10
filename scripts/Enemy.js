@@ -172,7 +172,7 @@ export default class Enemy extends Character{
     
     #triggerEnemyAction(actionName, durationInFrames, enemyActionCallback, endingAnimationCallback){
         if (this.activeActionName !== actionName){
-            this.state.lastActionCalledAt = state.GAME_FRAME;
+            this.state.lastActionCalledAt = state.TIMESTAMP;
         }
 
         this.activeActionName = actionName;
@@ -181,7 +181,7 @@ export default class Enemy extends Character{
             enemyActionCallback?.();
             if (durationInFrames){
                 if (this.state.lastActionCalledAt &&
-                    state.GAME_FRAME - this.state.lastActionCalledAt > durationInFrames &&
+                    state.TIMESTAMP - this.state.lastActionCalledAt > durationInFrames &&
                     this.state.frame >= this.state.activeAction.frameCount - 1
                 ){
                     endingAnimationCallback?.();

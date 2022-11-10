@@ -83,14 +83,13 @@ function init(){
         animate();
     }
 
-    function animate(){
+    function animate(timestamp){
         requestAnimationFrame(animate);
-
-        now = window.performance.now();
-        elapsed = now - then;
+        
+        elapsed = timestamp - then;
 
         if (elapsed > fpsInterval){
-            state.GAME_FRAME++;
+            state.TIMESTAMP = timestamp;
             clearCanvas(ctx);
             background.draw(ctx);
 

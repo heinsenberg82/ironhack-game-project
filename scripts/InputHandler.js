@@ -25,11 +25,11 @@ export default class InputHandler {
             if (key && this.keys.indexOf(key) === -1){
                 
                 if (key.interval){
-                    if (key.pressedAtFrame && state.GAME_FRAME - key.pressedAtFrame < key.interval) {
+                    if (key.pressedAtFrame && state.TIMESTAMP - key.pressedAtFrame < key.interval) {
                         return;
                     }
 
-                    key.pressedAtFrame = state.GAME_FRAME;
+                    key.pressedAtFrame = state.TIMESTAMP;
                 }
                 
                 if (key.persistent && !this.keys[this.keys.length - 1]?.persistent){

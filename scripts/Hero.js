@@ -59,7 +59,7 @@ export default class Hero extends Character{
 
             if (!this.state.dead){
                 if (pressedKey){
-                    const framesPassedStartedWalk = state.GAME_FRAME - this.state.lastStartedWalking;
+                    const framesPassedStartedWalk = state.TIMESTAMP - this.state.lastStartedWalking;
 
                     switch (pressedKey) {
                         case "ArrowRight":
@@ -67,7 +67,7 @@ export default class Hero extends Character{
                             this.state.blocking = false;
                             this.state.moving = true;
                             this.state.facingRight = true;
-                            this.state.lastStartedWalking ??= state.GAME_FRAME;
+                            this.state.lastStartedWalking ??= state.TIMESTAMP;
 
                             if(framesPassedStartedWalk < this.sprintInterval){
                                 Action.updatePlayerState("walk", this, () => {
@@ -99,7 +99,7 @@ export default class Hero extends Character{
                             this.state.blocking = false;
                             this.state.moving = true;
                             this.state.facingRight = false;
-                            this.state.lastStartedWalking ??= state.GAME_FRAME;
+                            this.state.lastStartedWalking ??= state.TIMESTAMP;
 
                             if(framesPassedStartedWalk < this.sprintInterval){
                                 Action.updatePlayerState("walk", this, () => {
